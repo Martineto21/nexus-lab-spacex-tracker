@@ -1,0 +1,60 @@
+🚀 *DÍA 1 — SETUP INICIAL*
+*SpaceX Tracker* con Kotlin + Jetpack Compose
+
+*🎯 OBJETIVO DE HOY*
+Crear tu primer proyecto Android dentro de Nexus Platform. Vas a aprender tanto Android como la plataforma que te ayudará todo el curso.
+
+*🔧 PASO A PASO CON NEXUS PLATFORM*
+
+1. *Crear cuenta:* Ve a app.kalmiazen.com y regístrate
+
+2. *Crear proyecto:*
+   • Dashboard → Proyectos → Nuevo Proyecto  
+   • Nombre: *SpaceX Tracker*
+   • Organización: *Nexus Lab*
+
+3. *Entrar al Workspace:*
+   • Menú lateral → Workspace
+   • Selecciona tu proyecto *SpaceX Tracker*
+   • 🆕 Haz clic en *Nueva pestaña* (ícono +)
+
+4. *¡PRIMER PROMPT! Cópialo y pégalo:*
+
+"Crea un proyecto Android nuevo con Kotlin y Jetpack Compose.
+Nombre del paquete: com.nexuslab.spacextracker  
+Versión mínima: API 26
+Incluye: Material 3, Navigation Compose, estructura MVVM
+Crea una pantalla principal con 'SpaceX Tracker' centrado y un ícono de cohete 🚀"
+
+5. *Revisar el código:*
+   • El agente generará TODOS los archivos
+   • MainActivity.kt, themes, layouts, manifests...
+   • Explora qué ha creado
+
+6. *Si algo no te gusta:*
+   • "Cambia el color del texto a azul"
+   • "Haz el ícono más grande"
+   • "Añade mi nombre debajo del título"
+
+7. *Compilar:*
+   • Android Studio → Build → Make Project
+   • Run en tu emulador
+
+*📱 QUÉ ESPERAR*
+- MainActivity.kt con Compose
+- Tema Material 3 personalizado
+- Pantalla con logo de cohete
+- Estructura MVVM lista para crecer
+
+*💡 TIPS NEXUS*
+- Cada pestaña es un "hilo" de conversación
+- El agente recuerda todo lo que habéis hablado
+- Puedes pedirle cambios en cualquier momento
+- ¡Es tu copiloto de programación!
+
+*📦 CÓDIGO DE REFERENCIA*
+GitHub: https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/f283b1b
+
+*MAÑANA → Día 2:* Conectaremos con la API de SpaceX usando Nexus
+
+— Nexus Lab 🤖

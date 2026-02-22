@@ -15,34 +15,78 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/**
+ * Tema SpaceX Tracker - Generado por Nexus Platform
+ * 
+ * Implementa Material 3 con la identidad visual de SpaceX:
+ * - Tema oscuro por defecto (como el espacio)
+ * - Colores oficiales de SpaceX
+ * - Soporte para Material You (Android 12+)
+ * - Tipografía moderna y legible
+ */
+
 private val DarkColorScheme = darkColorScheme(
     primary = SpaceXBlue,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    onPrimary = SpaceXWhite,
+    primaryContainer = SpaceXBlueDark,
+    onPrimaryContainer = SpaceXWhite,
+    
+    secondary = SpaceXGray,
+    onSecondary = SpaceXTextPrimary,
+    secondaryContainer = SpaceXLightGray,
+    onSecondaryContainer = SpaceXTextPrimary,
+    
+    tertiary = SpaceXOrange,
+    onTertiary = SpaceXWhite,
+    
     background = SpaceXBlack,
-    surface = SpaceXBlack
+    onBackground = SpaceXTextPrimary,
+    
+    surface = SpaceXDarkGray,
+    onSurface = SpaceXTextPrimary,
+    surfaceVariant = SpaceXGray,
+    onSurfaceVariant = SpaceXTextSecondary,
+    
+    error = SpaceXRed,
+    onError = SpaceXWhite,
+    
+    outline = SpaceXTextSecondary,
+    outlineVariant = SpaceXLightGray
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = SpaceXBlue,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    onPrimary = SpaceXWhite,
+    primaryContainer = SpaceXBlueLight,
+    onPrimaryContainer = SpaceXTextOnLight,
+    
+    secondary = SpaceXLightGray,
+    onSecondary = SpaceXWhite,
+    secondaryContainer = SpaceXOffWhite,
+    onSecondaryContainer = SpaceXTextOnLight,
+    
+    tertiary = SpaceXOrange,
+    onTertiary = SpaceXWhite,
+    
     background = SpaceXWhite,
-    surface = SpaceXWhite
-
-    /* Other default colors to override
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onBackground = SpaceXTextOnLight,
+    
+    surface = SpaceXOffWhite,
+    onSurface = SpaceXTextOnLight,
+    surfaceVariant = SpaceXOffWhite,
+    onSurfaceVariant = SpaceXTextSecondary,
+    
+    error = SpaceXRed,
+    onError = SpaceXWhite,
+    
+    outline = SpaceXTextSecondary,
+    outlineVariant = SpaceXLightGray
 )
 
 @Composable
 fun SpaceXTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+    // Dynamic color está disponible en Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -55,6 +99,7 @@ fun SpaceXTrackerTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

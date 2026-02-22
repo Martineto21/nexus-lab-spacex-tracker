@@ -1,4 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SpaceX Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_launches">Launches</string>
+    <string name="nav_rockets">Rockets</string>
+    <string name="nav_about">About</string>
+    
+    <!-- Home Screen -->
+    <string name="welcome_title">SpaceX Tracker</string>
+    <string name="welcome_subtitle">Explora el universo de SpaceX</string>
+    
+    <!-- Launches Screen -->
+    <string name="launches_title">Lanzamientos SpaceX</string>
+    <string name="filter_all">Todos</string>
+    <string name="filter_upcoming">Próximos</string>
+    <string name="filter_success">Exitosos</string>
+    <string name="filter_failed">Fallidos</string>
+    
+    <!-- Rockets Screen -->
+    <string name="rockets_title">Cohetes SpaceX</string>
+    <string name="rocket_active">Activo</string>
+    <string name="rocket_retired">Retirado</string>
+    
+    <!-- About Screen -->
+    <string name="about_title">Acerca de</string>
+    
+    <!-- Common -->
+    <string name="created_by_nexus">Creado 100%% con Nexus Platform</string>
+    <string name="loading">Cargando...</string>
+    <string name="error">Error</string>
+    <string name="retry">Reintentar</string>
 </resources>
