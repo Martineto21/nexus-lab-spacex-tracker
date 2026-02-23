@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 
 /**
  * HomeScreen - Pantalla principal de bienvenida
@@ -33,9 +35,11 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LaunchesViewModel = viewModel()
 ) {
     val scrollState = rememberScrollState()
+    val uiState by viewModel.uiState.collectAsState()
     
     Column(
         modifier = modifier
@@ -51,6 +55,11 @@ fun HomeScreen(
         WelcomeHeader()
         
         Spacer(modifier = Modifier.height(16.dp))
+        
+        // Datos en vivo de SpaceX API
+        SpaceXDataCard(uiState, onRetry = { viewModel.loadLaunches() })
+        
+        Spacer(modifier = Modifier.height(8.dp))
         
         // Información sobre la app
         AppInfoCard()
@@ -94,6 +103,149 @@ private fun WelcomeHeader() {
             textAlign = TextAlign.Center,
             modifier = Modifier.alpha(0.7f)
         )
+    }
+}
+
+@Composable
+private fun SpaceXDataCard(
+    uiState: com.nexuslab.spacextracker.presentation.viewmodel.LaunchesUiState,
+    onRetry: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "📡",
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = "API SpaceX en Vivo",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+            
+            when {
+                uiState.isLoading -> {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = "Conectando con SpaceX API...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+                
+                uiState.error != null -> {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "❌ Error: ${uiState.error}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        
+                        Button(
+                            onClick = onRetry,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("🔄 Reintentar conexión")
+                        }
+                    }
+                }
+                
+                uiState.launches.isNotEmpty() -> {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "✅ Conectado exitosamente!",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontWeight = FontWeight.Medium
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            StatChip(
+                                label = "Total Lanzamientos",
+                                value = "${uiState.launches.size}",
+                                emoji = "🚀"
+                            )
+                            
+                            StatChip(
+                                label = "Exitosos",
+                                value = "${uiState.launches.count { it.success == true }}",
+                                emoji = "✅"
+                            )
+                        }
+                        
+                        val latestLaunch = uiState.launches.maxByOrNull { it.dateUtc }
+                        latestLaunch?.let { launch ->
+                            Text(
+                                text = "🆕 Último: ${launch.name}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.alpha(0.8f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatChip(
+    label: String,
+    value: String,
+    emoji: String
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = emoji, fontSize = 12.sp)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.alpha(0.7f)
+            )
+        }
     }
 }
 
