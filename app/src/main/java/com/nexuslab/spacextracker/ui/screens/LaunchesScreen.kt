@@ -1,66 +1,69 @@
 package com.nexuslab.spacextracker.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlinx.datetime.*
+import com.nexuslab.spacextracker.data.model.Launch
+import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 
 /**
  * LaunchesScreen - Pantalla de lanzamientos SpaceX
  * 
- * Generada automáticamente por Nexus Platform el 22/02/2026
+ * Actualizada para Día 3 del curso Nexus Lab - 24/02/2026
  * Agente responsable: Upe (Memoria Viva)
  * 
- * Características implementadas:
- * - Lista de lanzamientos con datos mock
- * - Estados: próximos, completados, fallidos
- * - Información detallada de cada misión
- * - Próximamente: conexión con SpaceX API real
- * - Filtros y búsqueda (próxima actualización)
+ * 🚀 NUEVAS CARACTERÍSTICAS DÍA 3:
+ * - Conexión REAL con API SpaceX (adiós datos mock!)
+ * - Cards rediseñadas con Material 3 avanzado
+ * - Imágenes de parches de misiones (Coil)
+ * - Estados de carga con animaciones
+ * - Mejor gestión de errores
+ * - Filtros mejorados con chips interactivos
+ * - Layout responsive y accesible
  */
-
-// Modelo de datos temporal (será reemplazado por API real)
-data class Launch(
-    val id: String,
-    val name: String,
-    val description: String,
-    val dateUtc: String,
-    val rocket: String,
-    val success: Boolean?,
-    val upcoming: Boolean,
-    val patch: String? = null
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LaunchesScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LaunchesViewModel = viewModel()
 ) {
     var selectedFilter by remember { mutableStateOf(LaunchFilter.ALL) }
-    val launches = getSampleLaunches()
+    val uiState by viewModel.uiState.collectAsState()
     
+    // Cargar datos al inicializar la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.loadLaunches()
+    }
+    
+    // Filtrar lanzamientos según el filtro seleccionado
     val filteredLaunches = when (selectedFilter) {
-        LaunchFilter.ALL -> launches
-        LaunchFilter.UPCOMING -> launches.filter { it.upcoming }
-        LaunchFilter.SUCCESS -> launches.filter { it.success == true }
-        LaunchFilter.FAILED -> launches.filter { it.success == false }
+        LaunchFilter.ALL -> uiState.launches
+        LaunchFilter.UPCOMING -> uiState.launches.filter { it.upcoming }
+        LaunchFilter.SUCCESS -> uiState.launches.filter { it.success == true }
+        LaunchFilter.FAILED -> uiState.launches.filter { it.success == false }
     }
     
     Column(
@@ -68,32 +71,55 @@ fun LaunchesScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        // Header
-        Text(
-            text = "🚀 Lanzamientos SpaceX",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
+        // Header animado
+        AnimatedHeader()
         
-        // Filtros
-        LaunchFilterRow(
-            selectedFilter = selectedFilter,
-            onFilterSelected = { selectedFilter = it }
+        // Estado de conexión API
+        ApiConnectionBanner(
+            isLoading = uiState.isLoading,
+            error = uiState.error,
+            totalLaunches = uiState.launches.size,
+            onRetry = { viewModel.loadLaunches() }
         )
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Lista de lanzamientos
-        if (filteredLaunches.isEmpty()) {
-            EmptyLaunchesState(filter = selectedFilter)
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(filteredLaunches) { launch ->
-                    LaunchCard(launch = launch)
+        // Filtros mejorados
+        LaunchFilterRow(
+            selectedFilter = selectedFilter,
+            onFilterSelected = { selectedFilter = it },
+            launchCounts = LaunchCounts(
+                total = uiState.launches.size,
+                upcoming = uiState.launches.count { it.upcoming },
+                success = uiState.launches.count { it.success == true },
+                failed = uiState.launches.count { it.success == false }
+            )
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Contenido principal con estados
+        when {
+            uiState.isLoading && uiState.launches.isEmpty() -> {
+                LoadingState()
+            }
+            uiState.error != null && uiState.launches.isEmpty() -> {
+                ErrorState(
+                    error = uiState.error,
+                    onRetry = { viewModel.loadLaunches() }
+                )
+            }
+            filteredLaunches.isEmpty() -> {
+                EmptyLaunchesState(filter = selectedFilter)
+            }
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(filteredLaunches, key = { it.id }) { launch ->
+                        AnimatedLaunchCard(launch = launch)
+                    }
                 }
             }
         }
@@ -107,91 +133,406 @@ enum class LaunchFilter(val label: String) {
     FAILED("Fallidos")
 }
 
+data class LaunchCounts(
+    val total: Int,
+    val upcoming: Int,
+    val success: Int,
+    val failed: Int
+)
+
+@Composable
+private fun AnimatedHeader() {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(
+            initialOffsetY = { -it },
+            animationSpec = tween(800, easing = EaseOutBounce)
+        ) + fadeIn(animationSpec = tween(800))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "🚀",
+                style = MaterialTheme.typography.headlineLarge
+            )
+            
+            Column {
+                Text(
+                    text = "SpaceX Launches",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Datos en vivo desde la API oficial",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.alpha(0.8f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ApiConnectionBanner(
+    isLoading: Boolean,
+    error: String?,
+    totalLaunches: Int,
+    onRetry: () -> Unit
+) {
+    AnimatedVisibility(
+        visible = isLoading || error != null || totalLaunches > 0,
+        enter = slideInVertically() + fadeIn(),
+        exit = slideOutVertically() + fadeOut()
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = when {
+                    error != null -> MaterialTheme.colorScheme.errorContainer
+                    isLoading -> MaterialTheme.colorScheme.secondaryContainer
+                    else -> MaterialTheme.colorScheme.primaryContainer
+                }
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                when {
+                    isLoading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = "Cargando datos de SpaceX...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    error != null -> {
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = "Error",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Text(
+                            text = "Error de conexión",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = onRetry) {
+                            Text("Reintentar")
+                        }
+                    }
+                    else -> {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Conectado",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "✨ $totalLaunches lanzamientos cargados desde SpaceX API",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun LaunchFilterRow(
     selectedFilter: LaunchFilter,
-    onFilterSelected: (LaunchFilter) -> Unit
+    onFilterSelected: (LaunchFilter) -> Unit,
+    launchCounts: LaunchCounts
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         LaunchFilter.values().forEach { filter ->
+            val count = when (filter) {
+                LaunchFilter.ALL -> launchCounts.total
+                LaunchFilter.UPCOMING -> launchCounts.upcoming
+                LaunchFilter.SUCCESS -> launchCounts.success
+                LaunchFilter.FAILED -> launchCounts.failed
+            }
+            
             FilterChip(
                 onClick = { onFilterSelected(filter) },
-                label = { Text(filter.label) },
-                selected = selectedFilter == filter
+                label = { 
+                    Text("${filter.label} ($count)")
+                },
+                selected = selectedFilter == filter,
+                leadingIcon = if (selectedFilter == filter) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                } else null
             )
         }
     }
 }
 
 @Composable
-private fun LaunchCard(
+private fun LoadingState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(48.dp),
+            strokeWidth = 4.dp
+        )
+        
+        Text(
+            text = "🚀 Conectando con SpaceX...",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
+        
+        Text(
+            text = "Descargando datos de lanzamientos en tiempo real",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.alpha(0.7f)
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    error: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "⚠️",
+            style = MaterialTheme.typography.displayMedium
+        )
+        
+        Text(
+            text = "Error de conexión",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
+        
+        Text(
+            text = error,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.alpha(0.7f)
+        )
+        
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Reintentar conexión")
+        }
+    }
+}
+
+@Composable
+private fun AnimatedLaunchCard(
     launch: Launch,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(launch.id) {
+        visible = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(
+            initialOffsetY = { it / 4 }
+        ) + fadeIn(animationSpec = tween(300)),
+        modifier = modifier
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
         ) {
-            // Header del launch
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(20.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                // Header con imagen de parche
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Imagen del parche de la misión
+                    launch.links.patch?.small?.let { patchUrl ->
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(patchUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Parche de ${launch.name}",
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Fit
+                        )
+                    } ?: run {
+                        // Placeholder cuando no hay parche
+                        Surface(
+                            modifier = Modifier.size(60.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "🚀",
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Información principal
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = launch.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        
+                        // Rocket chip
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text(
+                                text = "🚗 ${launch.rocketId}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                    
+                    // Estado del lanzamiento
+                    LaunchStatusBadge(launch = launch)
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Descripción (si existe)
+                launch.details?.let { details ->
                     Text(
-                        text = launch.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
+                        text = details,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.alpha(0.8f),
+                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
                     
-                    Text(
-                        text = launch.rocket,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.alpha(0.8f)
-                    )
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
                 
-                // Estado del launch
-                LaunchStatusBadge(launch = launch)
-            }
-            
-            // Descripción
-            Text(
-                text = launch.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.alpha(0.8f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            // Fecha
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = "Fecha",
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Text(
-                    text = formatLaunchDate(launch.dateUtc),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Información de fecha y enlaces
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Fecha
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Fecha",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        Text(
+                            text = formatLaunchDate(launch.dateUtc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    
+                    // Enlaces disponibles
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        launch.links.video?.let {
+                            IconButton(
+                                onClick = { /* TODO: Abrir video */ },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = "Ver video",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                        
+                        launch.links.wikipedia?.let {
+                            IconButton(
+                                onClick = { /* TODO: Abrir Wikipedia */ },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "Ver en Wikipedia",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -223,26 +564,27 @@ private fun LaunchStatusBadge(launch: Launch) {
     }
     
     Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = MaterialTheme.shapes.small
+        color = color.copy(alpha = 0.15f),
+        shape = RoundedCornerShape(12.dp),
+        border = null
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(12.dp),
+                modifier = Modifier.size(16.dp),
                 tint = color
             )
             
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = color,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
@@ -288,59 +630,15 @@ private fun formatLaunchDate(dateUtc: String): String {
     return try {
         val instant = Instant.parse(dateUtc)
         val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        "${localDateTime.dayOfMonth}/${localDateTime.monthNumber}/${localDateTime.year}"
+        val day = localDateTime.dayOfMonth.toString().padStart(2, '0')
+        val month = localDateTime.monthNumber.toString().padStart(2, '0')
+        val year = localDateTime.year
+        val hour = localDateTime.hour.toString().padStart(2, '0')
+        val minute = localDateTime.minute.toString().padStart(2, '0')
+        
+        "$day/$month/$year $hour:$minute"
     } catch (e: Exception) {
-        dateUtc.take(10)  // Fallback a formato simple
+        // Fallback para fechas con formato incorrecto
+        dateUtc.take(10).replace("-", "/")
     }
-}
-
-// Datos de ejemplo (serán reemplazados por API real)
-private fun getSampleLaunches(): List<Launch> {
-    return listOf(
-        Launch(
-            id = "1",
-            name = "Starship IFT-3",
-            description = "Tercer vuelo de prueba integrado del sistema Starship con objetivos de transferencia de propelente.",
-            dateUtc = "2024-03-14T13:25:00.000Z",
-            rocket = "Starship",
-            success = true,
-            upcoming = false
-        ),
-        Launch(
-            id = "2", 
-            name = "Starlink Group 6-40",
-            description = "Despliegue de 23 satélites Starlink v2.0 a órbita terrestre baja desde Cabo Cañaveral.",
-            dateUtc = "2024-02-25T07:30:00.000Z",
-            rocket = "Falcon 9",
-            success = true,
-            upcoming = false
-        ),
-        Launch(
-            id = "3",
-            name = "Europa Clipper",
-            description = "Misión de la NASA para explorar la luna Europa de Júpiter y su océano subsuperficial.",
-            dateUtc = "2024-10-10T16:06:00.000Z",
-            rocket = "Falcon Heavy",
-            success = null,
-            upcoming = true
-        ),
-        Launch(
-            id = "4",
-            name = "Crew-8",
-            description = "Octava misión comercial de tripulación a la Estación Espacial Internacional.",
-            dateUtc = "2024-03-03T10:53:00.000Z",
-            rocket = "Falcon 9",
-            success = true,
-            upcoming = false
-        ),
-        Launch(
-            id = "5",
-            name = "Artemis 3",
-            description = "Primera misión tripulada a la Luna en el programa Artemis. Aterrizaje en el polo sur lunar.",
-            dateUtc = "2026-12-01T00:00:00.000Z",
-            rocket = "Starship HLS",
-            success = null,
-            upcoming = true
-        )
-    )
 }

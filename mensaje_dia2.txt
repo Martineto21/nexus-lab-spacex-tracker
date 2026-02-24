@@ -1,0 +1,31 @@
+DÍA 2 - SPACEX TRACKER COURSE
+============================
+Fecha: 23 febrero 2026 10:00
+Estado: ✅ COMPLETADO
+
+CÓDIGO GENERADO:
+- ✅ Modelos de datos: Launch.kt, Rocket.kt
+- ✅ API Service: SpaceXApiService.kt  
+- ✅ Network: NetworkModule.kt con Retrofit + OkHttp
+- ✅ Repository: SpaceXRepository.kt con manejo de errores
+- ✅ ViewModel: LaunchesViewModel.kt con StateFlow
+- ✅ UI: HomeScreen actualizada con datos en vivo
+
+GIT:
+- ✅ Commit: 8a45c4e
+- ✅ Push: exitoso
+- ✅ URL: https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/8a45c4e
+
+WHATSAPP:
+- ✅ Mensaje enviado a grupo "Nexus Dev Community"
+- ✅ ID mensaje: 82459
+- ✅ Status: 200 OK
+
+PRÓXIMO DÍA (Día 3 - 24 feb):
+- Lista de lanzamientos con cards Material 3
+- LazyColumn responsive
+- Navegación a pantalla de detalle
+
+LECCIÓN APRENDIDA:
+Los alumnos aprenden a conectar APIs reales usando Nexus Platform.
+Prompt clave: "Conecta con la API de SpaceX usando Retrofit..."
