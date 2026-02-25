@@ -74,6 +74,23 @@ class SpaceXRepository {
         }
     }
     
+    suspend fun getLaunchById(id: String): Launch? {
+        return try {
+            val response = apiService.getLaunchById(id)
+            if (response.isSuccessful) {
+                val launch = response.body()
+                Log.d("SpaceXRepository", "✅ Loaded launch detail: ${launch?.name}")
+                launch
+            } else {
+                Log.e("SpaceXRepository", "❌ Error getting launch by ID: ${response.code()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("SpaceXRepository", "❌ Error getting launch by ID: ${e.message}", e)
+            null
+        }
+    }
+    
     suspend fun getAllRockets(): Result<List<Rocket>> {
         return try {
             val response = apiService.getAllRockets()

@@ -2,6 +2,7 @@ package com.nexuslab.spacextracker.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -47,6 +48,7 @@ import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LaunchesScreen(
+    onLaunchClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: LaunchesViewModel = viewModel()
 ) {
@@ -118,7 +120,10 @@ fun LaunchesScreen(
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     items(filteredLaunches, key = { it.id }) { launch ->
-                        AnimatedLaunchCard(launch = launch)
+                        AnimatedLaunchCard(
+                            launch = launch,
+                            onClick = { onLaunchClick(launch.id) }
+                        )
                     }
                 }
             }
@@ -370,6 +375,7 @@ private fun ErrorState(
 @Composable
 private fun AnimatedLaunchCard(
     launch: Launch,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -386,7 +392,9 @@ private fun AnimatedLaunchCard(
         modifier = modifier
     ) {
         ElevatedCard(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
         ) {
             Column(

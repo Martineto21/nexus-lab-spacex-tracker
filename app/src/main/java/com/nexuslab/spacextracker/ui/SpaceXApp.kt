@@ -12,14 +12,17 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.nexuslab.spacextracker.ui.screens.*
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 
 /**
  * SpaceXApp - Aplicación principal con navegación
  * 
- * Generada automáticamente por Nexus Platform el 22/02/2026
+ * Actualizada para Día 4 del curso Nexus Lab - 25/02/2026
  * 
  * Características implementadas:
  * - Navegación inferior con 4 pantallas principales
+ * - Navegación a pantalla de detalle de lanzamiento
  * - Estado de navegación reactivo
  * - Iconografía Material Icons
  * - Transiciones fluidas entre pantallas
@@ -92,13 +95,29 @@ fun SpaceXApp(
                 HomeScreen()
             }
             composable(SpaceXScreen.LAUNCHES.route) {
-                LaunchesScreen()
+                LaunchesScreen(
+                    onLaunchClick = { launchId ->
+                        navController.navigate("launch_detail/$launchId")
+                    }
+                )
             }
             composable(SpaceXScreen.ROCKETS.route) {
                 RocketsScreen()
             }
             composable(SpaceXScreen.ABOUT.route) {
                 AboutScreen()
+            }
+            composable(
+                route = "launch_detail/{launchId}",
+                arguments = listOf(navArgument("launchId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val launchId = backStackEntry.arguments?.getString("launchId") ?: ""
+                LaunchDetailScreen(
+                    launchId = launchId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
