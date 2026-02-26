@@ -1,0 +1,72 @@
+🚀 *NEXUS LAB - DÍA 5: COUNTDOWN TIMER AL PRÓXIMO LANZAMIENTO*
+
+¡Hola equipo! Hoy vamos a añadir emoción a nuestra app con un countdown timer en tiempo real al próximo lanzamiento de SpaceX. ⏰
+
+*📱 QUE VAMOS A HACER HOY:*
+• Timer dinámico que cuenta hasta el próximo lanzamiento
+• Coroutinas para actualización en tiempo real cada segundo
+• Pantalla dedicada con diseño visual atractivo
+• Integración automática con la API de próximos lanzamientos
+
+*🎯 PASOS EN NEXUS PLATFORM:*
+
+1. *Ve a app.kalmiazen.com* → Workspace → Proyecto "SpaceX Tracker"
+2. *Abre nueva pestaña* en el Workspace (icono + arriba a la derecha)
+3. *Copia y pega esto al agente:*
+
+```
+Añade una pantalla de countdown timer para SpaceX:
+
+1. Crea CountdownViewModel que:
+   - Busque el próximo lanzamiento (upcoming = true)
+   - Calcule tiempo restante en días, horas, minutos, segundos
+   - Use Coroutines para actualizar cada segundo
+
+2. Crea CountdownScreen con:
+   - Nombre de la misión destacado
+   - Countdown visual grande y llamativo
+   - Información de fecha y estado
+   - Diseño moderno con gradientes y cards
+
+3. Añade navegación:
+   - Nueva pestaña "Countdown" en bottom navigation
+   - Ícono Timer apropiado
+
+Usa Material 3, colores SpaceX, y que sea emocionante de ver.
+```
+
+*🔍 QUE ESPERAR DEL AGENTE:*
+• CountdownViewModel.kt - lógica del timer con Coroutines
+• CountdownScreen.kt - pantalla visual del countdown
+• Navegación actualizada con nueva pestaña
+• Formateo automático de tiempo (Xd Xh Xm Xs)
+• Manejo de errores si no hay próximos lanzamientos
+
+*✅ COMO VERIFICAR QUE FUNCIONA:*
+• Compila y ejecuta la app
+• Ve a la pestaña "Countdown" 
+• Debería mostrar la próxima misión y el timer actualizándose
+• El countdown cambia cada segundo automáticamente
+
+*💡 TIPS NEXUS PLATFORM:*
+• Si el timer no se actualiza: dile al agente "El countdown no se actualiza en tiempo real"
+• Si quieres más animaciones: "Añade animaciones al cambio de números"
+• Si falla la API: "Añade estado de loading y error más claro"
+
+*🚀 CÓDIGO DE REFERENCIA:*
+Todo el código estará en GitHub para que puedas comparar:
+👉 https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/[COMMIT_HASH]
+
+*🎮 RETO BONUS:*
+Pídele al agente que añada efectos visuales cuando falten menos de 24 horas: colores rojos, pulsaciones, etc.
+
+*📚 CONCEPTOS QUE APRENDES HOY:*
+• Coroutines y StateFlow en Compose
+• Actualización de UI en tiempo real
+• Manejo de fechas e Instant en Kotlin
+• Diseño de countdown timers
+• *Y todo trabajando CON Nexus como copiloto*
+
+¡Mañana añadiremos mapas interactivos con ubicaciones de lanzamientos! 🗺️
+
+— *Nexus Lab*

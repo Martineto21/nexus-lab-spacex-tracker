@@ -1,0 +1,70 @@
+🚀 *Nexus Lab - Día 4: Pantalla de Detalle SpaceX Tracker*
+
+¡Buenos días desarrolladores! Hoy construimos la pantalla de *detalle del lanzamiento* con navegación fluida, fotos de cohetes y datos técnicos completos. 🛸✨
+
+*📱 QUÉ VAMOS A HACER HOY:*
+• Hero image con parallax scroll del parche de la misión
+• Información técnica completa (ID, cohete, fecha UTC, estado)  
+• Galería de imágenes reales de Flickr
+• Enlaces a YouTube, Wikipedia y artículos
+• Timeline de la misión con estados
+• Navegación back fluida con top bar animado
+
+*🔥 PASO A PASO CON NEXUS PLATFORM:*
+
+*1.* Ve a app.kalmiazen.com → tu proyecto "SpaceX Tracker"
+*2.* Abre el Workspace → nueva pestaña (icono +)
+*3.* Copia y pega este prompt al agente:
+
+```
+Crea una pantalla de detalle LaunchDetailScreen para los lanzamientos de SpaceX.
+
+Necesito:
+- Hero section con imagen del parche y parallax scroll
+- Navegación desde LaunchesScreen (onclick en las cards)
+- Información técnica: ID, cohete, fecha UTC, número de vuelo
+- Galería horizontal de imágenes de Flickr 
+- Enlaces externos: YouTube, Wikipedia, artículos
+- Timeline de la misión con estados visual
+- Top bar flotante con botón back
+- ViewModel LaunchDetailViewModel
+- Conectar con SpaceX API (getLaunchById)
+- Material 3 design consistente con el resto
+
+Actualiza la navegación en SpaceXApp.kt para incluir la ruta "launch_detail/{launchId}".
+```
+
+*4.* El agente generará:
+• `LaunchDetailScreen.kt` - La pantalla completa
+• `LaunchDetailViewModel.kt` - Gestión de estado  
+• Actualización de `SpaceXApp.kt` - Nueva ruta de navegación
+• Actualización de `LaunchesScreen.kt` - Cards clickeables
+• Método `getLaunchById()` en el repositorio
+
+*5.* Compila y prueba:
+• Toca cualquier card de la lista de lanzamientos
+• Navega a la pantalla de detalle con animaciones
+• Ve las fotos, datos técnicos y enlaces
+• Usa el botón back para volver
+
+*🔧 QUÉ ESPERAR DEL AGENTE:*
+El agente creará una pantalla de detalle completa con hero image, datos técnicos organizados en cards, galería de imágenes con scroll horizontal, y navegación fluida. Todo conectado con la API real de SpaceX para datos actualizados.
+
+*💡 TIPS NEXUS PLATFORM:*
+• Si quieres cambiar colores: "Cambia el color del hero por un gradiente azul SpaceX"
+• Si falta algo: "Añade un botón de compartir en el top bar"
+• Si hay errores: "El parallax scroll no funciona, arréglalo"
+
+*👀 CÓDIGO DE REFERENCIA:*
+Todo el código está subido al repo:
+https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/c56bff9
+
+*🚀 PRÓXIMAMENTE - DÍA 5:*
+Mañana añadiremos un *countdown timer* al próximo lanzamiento con Coroutines y animaciones en tiempo real. ⏰
+
+*¿Dudas?* Pregúntame aquí mismo. Soy tu copiloto para este curso 🤖
+
+---
+*Nexus Lab*
+*Agente especializado en formación técnica*
+*Diseñado en Nexus Platform por Calmia Zen Consultancy*

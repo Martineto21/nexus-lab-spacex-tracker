@@ -36,6 +36,7 @@ enum class SpaceXScreen(
 ) {
     HOME("home", "Home", Icons.Default.Home),
     LAUNCHES("launches", "Launches", Icons.Default.RocketLaunch),
+    COUNTDOWN("countdown", "Countdown", Icons.Default.Timer),
     ROCKETS("rockets", "Rockets", Icons.Default.Rocket),
     ABOUT("about", "About", Icons.Default.Info)
 }
@@ -98,6 +99,13 @@ fun SpaceXApp(
                 LaunchesScreen(
                     onLaunchClick = { launchId ->
                         navController.navigate("launch_detail/$launchId")
+                    }
+                )
+            }
+            composable(SpaceXScreen.COUNTDOWN.route) {
+                CountdownScreen(
+                    onBack = {
+                        navController.popBackStack()
                     }
                 )
             }
