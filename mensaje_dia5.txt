@@ -55,7 +55,7 @@ Usa Material 3, colores SpaceX, y que sea emocionante de ver.
 
 *🚀 CÓDIGO DE REFERENCIA:*
 Todo el código estará en GitHub para que puedas comparar:
-👉 https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/[COMMIT_HASH]
+👉 https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/e812ff9
 
 *🎮 RETO BONUS:*
 Pídele al agente que añada efectos visuales cuando falten menos de 24 horas: colores rojos, pulsaciones, etc.
