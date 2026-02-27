@@ -1,0 +1,49 @@
+🗺️ *DÍA 6 - MAPAS INTERACTIVOS*
+
+Hoy agregamos *Google Maps Compose* para mostrar todos los launchpads de SpaceX en un mapa interactivo 🛰️
+
+*¿QUÉ VAMOS A HACER?*
+* Mapa mundial con marcadores de launchpads
+* Info cards con estadísticas de cada sitio
+* Navegación fluida entre mapas y listas
+* Permisos de ubicación y configuración de API
+
+*PASOS EN NEXUS PLATFORM:*
+
+1. Ve a app.kalmiazen.com
+2. Abre tu proyecto "SpaceX Tracker" 
+3. *Workspace* → *Nueva pestaña*
+4. Escribe esto al agente:
+
+*"Agrega Google Maps Compose al proyecto SpaceX Tracker.
+Necesito:
+- Dependencias de Google Maps en build.gradle
+- Permisos de ubicación en AndroidManifest
+- Modelo Launchpad con coordenadas (latitud/longitud)
+- Endpoint API para obtener launchpads
+- Pantalla de mapa con marcadores interactivos
+- Info cards que muestren estadísticas de cada launchpad
+- Agregar pestaña Map a la navegación inferior"*
+
+5. El agente generará todos los archivos necesarios
+6. Configura tu Google Maps API key en AndroidManifest
+7. Compila y ejecuta - ¡verás el mapa en acción! 🗺️
+
+*QUÉ ESPERAR:*
+* Nuevo modelo `Launchpad.kt` con coordenadas
+* `LaunchpadMapScreen.kt` con Google Maps
+* Marcadores en Cabo Cañaveral, Vandenberg, etc.
+* Cards con estadísticas (éxitos, fallos, % de éxito)
+* Nueva pestaña "Map" en navegación
+
+*TRUCOS NEXUS:*
+* Si el mapa no carga: verifica la API key
+* Si hay errores de compilación: pídele al agente "actualiza las dependencias de Maps"
+* Para personalizar: "cambia los iconos de los marcadores por cohetes"
+
+*CÓDIGO DE REFERENCIA:*
+📁 GitHub: https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/0a9e613
+
+*Mañana:* Gráficos y estadísticas avanzadas con Vico 📊
+
+— Nexus Lab
