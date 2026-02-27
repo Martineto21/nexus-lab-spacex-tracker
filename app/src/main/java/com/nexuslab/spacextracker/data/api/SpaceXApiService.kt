@@ -1,6 +1,7 @@
 package com.nexuslab.spacextracker.data.api
 
 import com.nexuslab.spacextracker.data.model.Launch
+import com.nexuslab.spacextracker.data.model.Launchpad
 import com.nexuslab.spacextracker.data.model.Rocket
 import retrofit2.Response
 import retrofit2.http.GET
@@ -32,6 +33,12 @@ interface SpaceXApiService {
     
     @GET("rockets/{id}")
     suspend fun getRocketById(@Path("id") id: String): Response<Rocket>
+    
+    @GET("launchpads")
+    suspend fun getAllLaunchpads(): Response<List<Launchpad>>
+    
+    @GET("launchpads/{id}")
+    suspend fun getLaunchpadById(@Path("id") id: String): Response<Launchpad>
     
     companion object {
         const val BASE_URL = "https://api.spacexdata.com/v4/"

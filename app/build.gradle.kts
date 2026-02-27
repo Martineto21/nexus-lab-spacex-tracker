@@ -88,6 +88,11 @@ dependencies {
     // Date handling
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

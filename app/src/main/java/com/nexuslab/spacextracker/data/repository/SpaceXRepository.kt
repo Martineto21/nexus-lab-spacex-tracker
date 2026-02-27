@@ -3,6 +3,7 @@ package com.nexuslab.spacextracker.data.repository
 import android.util.Log
 import com.nexuslab.spacextracker.data.api.SpaceXApiService
 import com.nexuslab.spacextracker.data.model.Launch
+import com.nexuslab.spacextracker.data.model.Launchpad
 import com.nexuslab.spacextracker.data.model.Rocket
 import com.nexuslab.spacextracker.data.network.NetworkModule
 
@@ -109,6 +110,46 @@ class SpaceXRepository {
         } catch (e: Exception) {
             Log.e("SpaceXRepository", "❌ Error getting rockets: ${e.message}", e)
             Result.failure(e)
+        }
+    }
+    
+    suspend fun getAllLaunchpads(): Result<List<Launchpad>> {
+        return try {
+            val response = apiService.getAllLaunchpads()
+            if (response.isSuccessful) {
+                val launchpads = response.body() ?: emptyList()
+                Log.d("SpaceXRepository", "✅ Loaded ${launchpads.size} launchpads successfully")
+                
+                launchpads.forEach { pad ->
+                    Log.d("SpaceXRepository", "🚁 Launchpad: ${pad.name} (${pad.locality}) - " +
+                            "Lat: ${pad.latitude}, Lng: ${pad.longitude} - " +
+                            "Success rate: ${pad.successRate}%")
+                }
+                
+                Result.success(launchpads)
+            } else {
+                Result.failure(Exception("API Error: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("SpaceXRepository", "❌ Error getting launchpads: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun getLaunchpadById(id: String): Launchpad? {
+        return try {
+            val response = apiService.getLaunchpadById(id)
+            if (response.isSuccessful) {
+                val launchpad = response.body()
+                Log.d("SpaceXRepository", "✅ Loaded launchpad detail: ${launchpad?.name}")
+                launchpad
+            } else {
+                Log.e("SpaceXRepository", "❌ Error getting launchpad by ID: ${response.code()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("SpaceXRepository", "❌ Error getting launchpad by ID: ${e.message}", e)
+            null
         }
     }
 }

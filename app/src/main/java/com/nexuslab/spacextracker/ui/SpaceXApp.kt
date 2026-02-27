@@ -37,6 +37,7 @@ enum class SpaceXScreen(
     HOME("home", "Home", Icons.Default.Home),
     LAUNCHES("launches", "Launches", Icons.Default.RocketLaunch),
     COUNTDOWN("countdown", "Countdown", Icons.Default.Timer),
+    MAP("launchpad_map", "Map", Icons.Default.Map),
     ROCKETS("rockets", "Rockets", Icons.Default.Rocket),
     ABOUT("about", "About", Icons.Default.Info)
 }
@@ -108,6 +109,9 @@ fun SpaceXApp(
                         navController.popBackStack()
                     }
                 )
+            }
+            composable(SpaceXScreen.MAP.route) {
+                LaunchpadMapScreen()
             }
             composable(SpaceXScreen.ROCKETS.route) {
                 RocketsScreen()
