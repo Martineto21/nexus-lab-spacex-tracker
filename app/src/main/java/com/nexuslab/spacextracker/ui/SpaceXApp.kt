@@ -18,11 +18,12 @@ import androidx.navigation.NavType
 /**
  * SpaceXApp - Aplicación principal con navegación
  * 
- * Actualizada para Día 4 del curso Nexus Lab - 25/02/2026
+ * Actualizada para Día 7 del curso Nexus Lab - 28/02/2026
  * 
  * Características implementadas:
- * - Navegación inferior con 4 pantallas principales
+ * - Navegación inferior con 7 pantallas principales
  * - Navegación a pantalla de detalle de lanzamiento
+ * - Pantalla de estadísticas con gráficos (NUEVO DÍA 7)
  * - Estado de navegación reactivo
  * - Iconografía Material Icons
  * - Transiciones fluidas entre pantallas
@@ -36,6 +37,7 @@ enum class SpaceXScreen(
 ) {
     HOME("home", "Home", Icons.Default.Home),
     LAUNCHES("launches", "Launches", Icons.Default.RocketLaunch),
+    STATISTICS("statistics", "Stats", Icons.Default.BarChart),
     COUNTDOWN("countdown", "Countdown", Icons.Default.Timer),
     MAP("launchpad_map", "Map", Icons.Default.Map),
     ROCKETS("rockets", "Rockets", Icons.Default.Rocket),
@@ -102,6 +104,9 @@ fun SpaceXApp(
                         navController.navigate("launch_detail/$launchId")
                     }
                 )
+            }
+            composable(SpaceXScreen.STATISTICS.route) {
+                StatisticsScreen()
             }
             composable(SpaceXScreen.COUNTDOWN.route) {
                 CountdownScreen(

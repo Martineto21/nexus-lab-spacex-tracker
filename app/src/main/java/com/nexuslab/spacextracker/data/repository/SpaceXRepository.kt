@@ -5,7 +5,11 @@ import com.nexuslab.spacextracker.data.api.SpaceXApiService
 import com.nexuslab.spacextracker.data.model.Launch
 import com.nexuslab.spacextracker.data.model.Launchpad
 import com.nexuslab.spacextracker.data.model.Rocket
+import com.nexuslab.spacextracker.data.model.SpaceXStatistics
+import com.nexuslab.spacextracker.data.model.YearlyStats
+import com.nexuslab.spacextracker.data.model.RocketStats
 import com.nexuslab.spacextracker.data.network.NetworkModule
+import kotlinx.datetime.Instant
 
 class SpaceXRepository {
     
@@ -150,6 +154,106 @@ class SpaceXRepository {
         } catch (e: Exception) {
             Log.e("SpaceXRepository", "❌ Error getting launchpad by ID: ${e.message}", e)
             null
+        }
+    }
+    
+    suspend fun getStatistics(): Result<SpaceXStatistics> {
+        return try {
+            val launchesResult = getAllLaunches()
+            val rocketsResult = getAllRockets()
+            
+            if (launchesResult.isSuccess && rocketsResult.isSuccess) {
+                val launches = launchesResult.getOrNull() ?: emptyList()
+                val rockets = rocketsResult.getOrNull() ?: emptyList()
+                
+                val statistics = calculateStatistics(launches, rockets)
+                Log.d("SpaceXRepository", "✅ Statistics calculated successfully")
+                Result.success(statistics)
+            } else {
+                Result.failure(Exception("Failed to load data for statistics"))
+            }
+        } catch (e: Exception) {
+            Log.e("SpaceXRepository", "❌ Error calculating statistics: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+    
+    private fun calculateStatistics(launches: List<Launch>, rockets: List<Rocket>): SpaceXStatistics {
+        val totalLaunches = launches.size
+        val successfulLaunches = launches.count { it.success == true }
+        val failedLaunches = launches.count { it.success == false }
+        
+        // Contar boosters recuperados (aproximación basada en datos disponibles)
+        val boostersRecovered = launches.count { 
+            it.cores?.any { core -> core.landingSuccess == true } == true
+        }
+        val boostersLost = launches.count { 
+            it.cores?.any { core -> core.landingSuccess == false } == true
+        }
+        
+        val successRate = if (totalLaunches > 0) {
+            (successfulLaunches.toFloat() / totalLaunches.toFloat()) * 100f
+        } else 0f
+        
+        // Estadísticas por año
+        val launchesPerYear = launches
+            .mapNotNull { launch ->
+                try {
+                    val instant = Instant.parse(launch.dateUtc)
+                    val year = instant.toString().substring(0, 4).toInt()
+                    Pair(year, launch)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            .groupBy { it.first }
+            .map { (year, launches) ->
+                val yearLaunches = launches.map { it.second }
+                YearlyStats(
+                    year = year,
+                    launches = yearLaunches.size,
+                    successes = yearLaunches.count { it.success == true },
+                    failures = yearLaunches.count { it.success == false }
+                )
+            }
+            .sortedBy { it.year }
+        
+        // Estadísticas por cohete
+        val rocketStats = launches
+            .groupBy { it.rocket }
+            .mapNotNull { (rocketId, launchList) ->
+                val rocket = rockets.find { it.id == rocketId }
+                if (rocket != null) {
+                    RocketStats(
+                        rocketName = rocket.name,
+                        launches = launchList.size,
+                        successes = launchList.count { it.success == true },
+                        failures = launchList.count { it.success == false },
+                        color = getRocketColor(rocket.name)
+                    )
+                } else null
+            }
+            .sortedByDescending { it.launches }
+        
+        return SpaceXStatistics(
+            totalLaunches = totalLaunches,
+            successfulLaunches = successfulLaunches,
+            failedLaunches = failedLaunches,
+            boostersRecovered = boostersRecovered,
+            boostersLost = boostersLost,
+            successRate = successRate,
+            launchesPerYear = launchesPerYear,
+            rocketStats = rocketStats
+        )
+    }
+    
+    private fun getRocketColor(rocketName: String): String {
+        return when (rocketName.lowercase()) {
+            "falcon 1" -> "#FF5722"      // Naranja
+            "falcon 9" -> "#2196F3"      // Azul
+            "falcon heavy" -> "#4CAF50"  // Verde
+            "starship" -> "#9C27B0"      // Púrpura
+            else -> "#607D8B"            // Gris azulado
         }
     }
 }
