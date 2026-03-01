@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-serialization")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -97,6 +99,14 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose:1.13.1")
     implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
     implementation("com.patrykandpatrick.vico:core:1.13.1")
+    
+    // DataStore for preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
+    // Dependency Injection - Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

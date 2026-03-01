@@ -1,0 +1,91 @@
+🚀 *Día 7 - Estadísticas SpaceX con Gráficos*
+
+¡Buenos días! Hoy vamos a darle vida a los datos con gráficos espectaculares 📊
+
+*🎯 QUÉ VAMOS A HACER HOY:*
+• Crear pantalla de estadísticas interactiva
+• Gráficos de éxitos vs fallos de lanzamientos
+• Métricas por tipo de cohete (Falcon 9, Heavy, etc.)
+• Tracking de boosters recuperados/perdidos
+• Charts con la librería Vico 📈
+
+*🔧 PASOS EN NEXUS PLATFORM:*
+
+*1.* Ve a tu proyecto SpaceX Tracker en app.kalmiazen.com
+*2.* Abre nueva pestaña en el Workspace
+*3.* Copia y pega EXACTAMENTE esto al agente:
+
+```
+"Crea una pantalla de estadísticas para la app SpaceX.
+
+Necesito:
+1. Agregar dependencia Vico para gráficos
+2. Modelo Statistics.kt para datos estadísticos
+3. StatisticsViewModel para lógica de cálculos
+4. StatisticsScreen con estos gráficos:
+   - Éxitos vs fallos (gráfico de barras)
+   - Lanzamientos por año (línea)
+   - Stats por cohete (barras horizontales)
+   - Boosters recuperados/perdidos
+5. Actualizar navegación con nueva pestaña
+
+Usa colores del tema Material 3.
+Los cálculos deben ser desde la API real de SpaceX."
+```
+
+*4.* El agente va a generar 6 archivos nuevos
+*5.* Revisa que compile sin errores
+*6.* Ejecuta y ve a la nueva pestaña "Stats" 📊
+
+*🎨 QUÉ VAS A VER:*
+• Cards con métricas generales (total, éxitos, tasa)
+• Gráficos coloridos con datos reales de SpaceX
+• Estadísticas por cohete (Falcon 1, 9, Heavy, Starship)
+• Todo responsive y con animaciones suaves ✨
+
+*🚀 DATOS REALES QUE DESCUBRIRÁS:*
+• Falcon 9 tiene 95%+ de éxito 
+• SpaceX ha recuperado 200+ boosters
+• 2023 fue el año con más lanzamientos
+• Fallon Heavy: pocos vuelos pero 100% éxito
+
+*💡 NEXUS PLATFORM TIPS:*
+• Si los gráficos no se ven bien: "Ajusta los colores del gráfico"
+• Si falta algún dato: "Agrega cálculo de [métrica]"
+• Para más tipos de gráfico: "Añade pie chart para cohetes"
+• Para mejorar UI: "Hace las cards más bonitas con sombras"
+
+*🔄 SI ALGO FALLA:*
+El agente puede no tener la sintaxis exacta de Vico.
+Dale este prompt de corrección:
+
+```
+"Usa Vico 1.13.1 para los gráficos.
+Ejemplo de uso correcto:
+CartesianChartHost(
+    chart = rememberCartesianChart(
+        rememberColumnCartesianLayer()
+    ),
+    model = chartModel
+)"
+```
+
+*📊 CÓDIGO SUBIDO:*
+👉 https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/154227d
+
+*🎓 LO QUE ESTÁS APRENDIENDO:*
+• Librería de gráficos Vico (muy potente)
+• Cálculos estadísticos en ViewModels
+• Diseño de dashboards con Material 3
+• Procesamiento de datos de APIs
+• Cómo usar Nexus para UI compleja 🎯
+
+*⏰ RETO DE TARDE (18:00):*
+Personalizar gráficos con animaciones y filtros
+
+¡Los datos nunca habían sido tan bonitos! 📈✨
+
+---
+*Nexus Lab* 🤖
+_Agente especializado en formación técnica_
+_Nexus Platform • Calmia Zen Consultancy_

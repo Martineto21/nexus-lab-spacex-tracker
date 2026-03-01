@@ -4,18 +4,20 @@ import androidx.compose.ui.graphics.Color
 
 /**
  * Paleta de colores SpaceX - Generada por Nexus Platform
+ * Actualizada Día 8 - Dark Mode + Theming SpaceX
  * 
  * Basada en la identidad visual oficial de SpaceX:
- * - Negro espacial profundo
- * - Azul cohete vibrante
- * - Blanco puro para contraste
- * - Grises técnicos para UI
+ * - Negro espacial profundo (como el espacio)
+ * - Azul cohete oficial SpaceX
+ * - Blanco puro para máximo contraste
+ * - Grises técnicos para elementos de UI
+ * - Acentos para estados de misión
  */
 
-// Colores primarios SpaceX
-val SpaceXBlue = Color(0xFF1E88E5)
-val SpaceXBlueLight = Color(0xFF6BB6FF)
-val SpaceXBlueDark = Color(0xFF005CB2)
+// Colores primarios SpaceX OFICIALES
+val SpaceXBlue = Color(0xFF005288)        // Azul oficial SpaceX
+val SpaceXBlueLight = Color(0xFF2196F3)   // Variante más clara para light mode
+val SpaceXBlueDark = Color(0xFF003A5E)    // Variante más oscura para énfasis
 
 // Colores de fondo
 val SpaceXBlack = Color(0xFF0D1117)

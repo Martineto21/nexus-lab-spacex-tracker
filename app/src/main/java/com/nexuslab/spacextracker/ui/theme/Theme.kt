@@ -58,10 +58,10 @@ private val LightColorScheme = lightColorScheme(
     primary = SpaceXBlue,
     onPrimary = SpaceXWhite,
     primaryContainer = SpaceXBlueLight,
-    onPrimaryContainer = SpaceXTextOnLight,
+    onPrimaryContainer = SpaceXWhite,
     
-    secondary = SpaceXLightGray,
-    onSecondary = SpaceXWhite,
+    secondary = Color(0xFFE0E0E0),
+    onSecondary = SpaceXTextOnLight,
     secondaryContainer = SpaceXOffWhite,
     onSecondaryContainer = SpaceXTextOnLight,
     
@@ -71,16 +71,16 @@ private val LightColorScheme = lightColorScheme(
     background = SpaceXWhite,
     onBackground = SpaceXTextOnLight,
     
-    surface = SpaceXOffWhite,
+    surface = SpaceXWhite,
     onSurface = SpaceXTextOnLight,
-    surfaceVariant = SpaceXOffWhite,
-    onSurfaceVariant = SpaceXTextSecondary,
+    surfaceVariant = Color(0xFFF5F5F5),
+    onSurfaceVariant = Color(0xFF666666),
     
     error = SpaceXRed,
     onError = SpaceXWhite,
     
-    outline = SpaceXTextSecondary,
-    outlineVariant = SpaceXLightGray
+    outline = Color(0xFFCCCCCC),
+    outlineVariant = Color(0xFFE0E0E0)
 )
 
 @Composable

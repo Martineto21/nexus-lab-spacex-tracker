@@ -41,14 +41,15 @@ enum class SpaceXScreen(
     COUNTDOWN("countdown", "Countdown", Icons.Default.Timer),
     MAP("launchpad_map", "Map", Icons.Default.Map),
     ROCKETS("rockets", "Rockets", Icons.Default.Rocket),
-    ABOUT("about", "About", Icons.Default.Info)
+    SETTINGS("settings", "Settings", Icons.Default.Settings)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpaceXApp(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    themeViewModel: com.nexuslab.spacextracker.presentation.viewmodel.ThemeViewModel? = null
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -121,8 +122,8 @@ fun SpaceXApp(
             composable(SpaceXScreen.ROCKETS.route) {
                 RocketsScreen()
             }
-            composable(SpaceXScreen.ABOUT.route) {
-                AboutScreen()
+            composable(SpaceXScreen.SETTINGS.route) {
+                SettingsScreen()
             }
             composable(
                 route = "launch_detail/{launchId}",
