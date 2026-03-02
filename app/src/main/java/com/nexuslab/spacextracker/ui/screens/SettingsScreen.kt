@@ -39,6 +39,7 @@ fun SettingsScreen(
             userPreferredTheme = null
         )
     )
+    val currentDarkTheme = themeViewModel.shouldUseDarkTheme()
 
     Column(
         modifier = modifier
@@ -93,8 +94,6 @@ fun SettingsScreen(
                             if (isChecked) {
                                 themeViewModel.followSystemTheme()
                             } else {
-                                // Si no sigue el sistema, usar el tema actual
-                                val currentDarkTheme = themeViewModel.shouldUseDarkTheme()
                                 themeViewModel.setTheme(currentDarkTheme)
                             }
                         }
@@ -246,7 +245,7 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
-                imageVector = if (themeViewModel.shouldUseDarkTheme()) {
+                imageVector = if (currentDarkTheme) {
                     Icons.Default.LightMode
                 } else {
                     Icons.Default.DarkMode
@@ -255,7 +254,7 @@ fun SettingsScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = if (themeViewModel.shouldUseDarkTheme()) {
+                text = if (currentDarkTheme) {
                     "Cambiar a tema claro"
                 } else {
                     "Cambiar a tema oscuro"

@@ -28,15 +28,16 @@ data class Launch(
 @Serializable
 data class Links(
     @SerialName("patch")
-    val patch: Patch?,
+    val patch: Patch? = null,
     @SerialName("reddit")
-    val reddit: Reddit?,
+    val reddit: Reddit? = null,
     @SerialName("article")
-    val article: String?,
+    val article: String? = null,
     @SerialName("wikipedia")
-    val wikipedia: String?,
-    @SerialName("video")
-    val video: String?
+    val wikipedia: String? = null,
+    // SpaceX API exposes this URL as `webcast`.
+    @SerialName("webcast")
+    val video: String? = null
 )
 
 @Serializable

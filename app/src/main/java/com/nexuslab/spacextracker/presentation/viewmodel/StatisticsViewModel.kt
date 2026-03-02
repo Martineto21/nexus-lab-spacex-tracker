@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexuslab.spacextracker.data.model.SpaceXStatistics
 import com.nexuslab.spacextracker.data.repository.SpaceXRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StatisticsViewModel : ViewModel() {
-    
-    private val repository = SpaceXRepository()
+@HiltViewModel
+class StatisticsViewModel @Inject constructor(
+    private val repository: SpaceXRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(StatisticsUiState())
     val uiState: StateFlow<StatisticsUiState> = _uiState.asStateFlow()

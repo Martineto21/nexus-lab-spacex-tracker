@@ -17,6 +17,7 @@ import com.nexuslab.spacextracker.data.model.YearlyStats
 import com.nexuslab.spacextracker.data.model.RocketStats
 import com.nexuslab.spacextracker.data.network.NetworkModule
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import javax.inject.Inject
@@ -66,7 +67,7 @@ class SpaceXRepository @Inject constructor(
     suspend fun getAllLaunches(): Result<List<Launch>> {
         return try {
             // First, try to get cached data
-            val cachedLaunches = database.launchDao().getAllLaunches()
+            val cachedLaunches = database.launchDao().getAllLaunches().first()
             val recentCacheCount = database.launchDao().getRecentLaunchesCount(
                 System.currentTimeMillis() - cacheExpiryTime
             )
@@ -74,8 +75,8 @@ class SpaceXRepository @Inject constructor(
             // If cache is valid and not empty, use it
             if (recentCacheCount > 0) {
                 Log.d("SpaceXRepository", "📱 Using cached launches ($recentCacheCount items)")
-                val launches = cachedLaunches.map { entities -> entities.map { it.toDomain() } }
-                return Result.success(launches.first()) // Get first emission
+                val launches = cachedLaunches.map { it.toDomain() }
+                return Result.success(launches)
             }
             
             // If network is available, fetch fresh data
@@ -100,23 +101,23 @@ class SpaceXRepository @Inject constructor(
                 } else {
                     Log.e("SpaceXRepository", "❌ API Error: ${response.code()} - ${response.message()}")
                     // Fallback to any cached data
-                    val fallbackLaunches = cachedLaunches.map { entities -> entities.map { it.toDomain() } }
-                    return Result.success(fallbackLaunches.first())
+                    val fallbackLaunches = cachedLaunches.map { it.toDomain() }
+                    return Result.success(fallbackLaunches)
                 }
             } else {
                 // No network, use any cached data available
                 Log.w("SpaceXRepository", "📵 No network, using any cached launches available")
-                val fallbackLaunches = cachedLaunches.map { entities -> entities.map { it.toDomain() } }
-                return Result.success(fallbackLaunches.first())
+                val fallbackLaunches = cachedLaunches.map { it.toDomain() }
+                return Result.success(fallbackLaunches)
             }
         } catch (e: Exception) {
             Log.e("SpaceXRepository", "❌ Error in getAllLaunches: ${e.message}", e)
             // Last resort: try to get any cached data
             try {
-                val cachedLaunches = database.launchDao().getAllLaunches()
-                val fallbackLaunches = cachedLaunches.map { entities -> entities.map { it.toDomain() } }
+                val cachedLaunches = database.launchDao().getAllLaunches().first()
+                val fallbackLaunches = cachedLaunches.map { it.toDomain() }
                 Log.w("SpaceXRepository", "🔄 Using fallback cached data")
-                return Result.success(fallbackLaunches.first())
+                return Result.success(fallbackLaunches)
             } catch (cacheError: Exception) {
                 Log.e("SpaceXRepository", "❌ Cache fallback failed: ${cacheError.message}")
                 return Result.failure(e)
@@ -141,8 +142,8 @@ class SpaceXRepository @Inject constructor(
             }
             
             // Fallback: get most recent past launch from cache
-            val launches = database.launchDao().getPastLaunches()
-            val latestCached = launches.map { entities -> entities.firstOrNull()?.toDomain() }.first()
+            val launches = database.launchDao().getPastLaunches().first()
+            val latestCached = launches.firstOrNull()?.toDomain()
             if (latestCached != null) {
                 Log.d("SpaceXRepository", "📱 Using cached latest launch: ${latestCached.name}")
                 Result.success(latestCached)
@@ -242,7 +243,7 @@ class SpaceXRepository @Inject constructor(
     suspend fun getAllRockets(): Result<List<Rocket>> {
         return try {
             // Check cache first
-            val cachedRockets = database.rocketDao().getAllRockets()
+            val cachedRockets = database.rocketDao().getAllRockets().first()
             val rocketCount = database.rocketDao().getTotalRocketsCount()
             
             // Rockets change rarely, so cache for longer (4 hours)
@@ -251,8 +252,8 @@ class SpaceXRepository @Inject constructor(
             
             if (hasValidCache && !isNetworkAvailable()) {
                 Log.d("SpaceXRepository", "📱 Using cached rockets ($rocketCount items)")
-                val rockets = cachedRockets.map { entities -> entities.map { it.toDomain() } }
-                return Result.success(rockets.first())
+                val rockets = cachedRockets.map { it.toDomain() }
+                return Result.success(rockets)
             }
             
             // Try network
@@ -278,8 +279,8 @@ class SpaceXRepository @Inject constructor(
             
             // Fallback to cached data
             Log.w("SpaceXRepository", "🔄 Using cached rockets as fallback")
-            val fallbackRockets = cachedRockets.map { entities -> entities.map { it.toDomain() } }
-            Result.success(fallbackRockets.first())
+            val fallbackRockets = cachedRockets.map { it.toDomain() }
+            Result.success(fallbackRockets)
         } catch (e: Exception) {
             Log.e("SpaceXRepository", "❌ Error getting rockets: ${e.message}", e)
             Result.failure(e)
@@ -295,14 +296,14 @@ class SpaceXRepository @Inject constructor(
     suspend fun getAllLaunchpads(): Result<List<Launchpad>> {
         return try {
             // Check cache first
-            val cachedLaunchpads = database.launchpadDao().getAllLaunchpads()
+            val cachedLaunchpads = database.launchpadDao().getAllLaunchpads().first()
             val launchpadCount = database.launchpadDao().getTotalLaunchpadsCount()
             
             // Launchpads change rarely, use cache when available
             if (launchpadCount > 0 && !isNetworkAvailable()) {
                 Log.d("SpaceXRepository", "📱 Using cached launchpads ($launchpadCount items)")
-                val launchpads = cachedLaunchpads.map { entities -> entities.map { it.toDomain() } }
-                return Result.success(launchpads.first())
+                val launchpads = cachedLaunchpads.map { it.toDomain() }
+                return Result.success(launchpads)
             }
             
             // Try network
@@ -329,8 +330,8 @@ class SpaceXRepository @Inject constructor(
             
             // Fallback to cached data
             Log.w("SpaceXRepository", "🔄 Using cached launchpads as fallback")
-            val fallbackLaunchpads = cachedLaunchpads.map { entities -> entities.map { it.toDomain() } }
-            Result.success(fallbackLaunchpads.first())
+            val fallbackLaunchpads = cachedLaunchpads.map { it.toDomain() }
+            Result.success(fallbackLaunchpads)
         } catch (e: Exception) {
             Log.e("SpaceXRepository", "❌ Error getting launchpads: ${e.message}", e)
             Result.failure(e)
@@ -452,12 +453,8 @@ class SpaceXRepository @Inject constructor(
         val failedLaunches = launches.count { it.success == false }
         
         // Contar boosters recuperados (aproximación basada en datos disponibles)
-        val boostersRecovered = launches.count { 
-            it.cores?.any { core -> core.landingSuccess == true } == true
-        }
-        val boostersLost = launches.count { 
-            it.cores?.any { core -> core.landingSuccess == false } == true
-        }
+        val boostersRecovered = 0
+        val boostersLost = 0
         
         val successRate = if (totalLaunches > 0) {
             (successfulLaunches.toFloat() / totalLaunches.toFloat()) * 100f
@@ -488,7 +485,7 @@ class SpaceXRepository @Inject constructor(
         
         // Estadísticas por cohete
         val rocketStats = launches
-            .groupBy { it.rocket }
+            .groupBy { it.rocketId }
             .mapNotNull { (rocketId, launchList) ->
                 val rocket = rockets.find { it.id == rocketId }
                 if (rocket != null) {

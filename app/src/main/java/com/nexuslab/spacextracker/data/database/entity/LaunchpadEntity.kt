@@ -36,7 +36,6 @@ data class LaunchpadEntity(
             launchAttempts = launchAttempts,
             launchSuccesses = launchSuccesses,
             rockets = emptyList(), // Would need JSON parsing
-            launches = emptyList(), // Would need JSON parsing
             status = status,
             details = details
         )

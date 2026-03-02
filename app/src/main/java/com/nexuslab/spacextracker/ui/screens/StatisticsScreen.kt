@@ -13,48 +13,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexuslab.spacextracker.data.model.SpaceXStatistics
 import com.nexuslab.spacextracker.data.model.YearlyStats
 import com.nexuslab.spacextracker.data.model.RocketStats
 import com.nexuslab.spacextracker.presentation.viewmodel.StatisticsViewModel
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
-import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
-import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.entryOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen(
     modifier: Modifier = Modifier,
-    viewModel: StatisticsViewModel = viewModel()
+    viewModel: StatisticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     // Manejar errores con Snackbar
     uiState.error?.let { error ->
         LaunchedEffect(error) {
             viewModel.clearError()
         }
     }
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Header con botón de refresh
+        // Header con boton de refresh
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -62,30 +56,30 @@ fun StatisticsScreen(
         ) {
             Column {
                 Text(
-                    text = "📊 Estadísticas SpaceX",
+                    text = "Estadisticas SpaceX",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Datos históricos y métricas",
+                    text = "Datos historicos y metricas",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             IconButton(
                 onClick = { viewModel.refreshStatistics() },
                 enabled = !uiState.isLoading
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Actualizar estadísticas"
+                    contentDescription = "Actualizar estadisticas"
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -99,7 +93,7 @@ fun StatisticsScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }
-        
+
         // Mostrar error si existe
         uiState.error?.let { error ->
             Snackbar(
@@ -124,29 +118,18 @@ private fun StatisticsContent(
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        // Estadísticas generales
         GeneralStatsCard(statistics)
-        
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // Gráfico de éxitos vs fallos
         SuccessFailureChart(statistics)
-        
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // Gráfico de lanzamientos por año
         if (statistics.launchesPerYear.isNotEmpty()) {
             LaunchesPerYearChart(statistics.launchesPerYear)
             Spacer(modifier = Modifier.height(16.dp))
         }
-        
-        // Estadísticas por cohete
         if (statistics.rocketStats.isNotEmpty()) {
             RocketStatsChart(statistics.rocketStats)
             Spacer(modifier = Modifier.height(16.dp))
         }
-        
-        // Estadísticas de boosters
         BoosterStatsCard(statistics)
     }
 }
@@ -161,12 +144,12 @@ private fun GeneralStatsCard(statistics: SpaceXStatistics) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🚀 Estadísticas Generales",
+                text = "Estadisticas Generales",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -174,17 +157,17 @@ private fun GeneralStatsCard(statistics: SpaceXStatistics) {
                 StatItem(
                     value = statistics.totalLaunches.toString(),
                     label = "Total Lanzamientos",
-                    icon = "🚀"
+                    icon = "T"
                 )
                 StatItem(
                     value = statistics.successfulLaunches.toString(),
                     label = "Exitosos",
-                    icon = "✅"
+                    icon = "OK"
                 )
                 StatItem(
                     value = "${String.format("%.1f", statistics.successRate)}%",
-                    label = "Tasa Éxito",
-                    icon = "📈"
+                    label = "Tasa Exito",
+                    icon = "%"
                 )
             }
         }
@@ -228,34 +211,32 @@ private fun SuccessFailureChart(statistics: SpaceXStatistics) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "📊 Éxitos vs Fallos",
+                text = "Exitos vs Fallos",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
+
             if (statistics.totalLaunches > 0) {
-                // Gráfico simple usando datos
-                val chartModel = CartesianChartModel(
-                    ColumnCartesianLayerModel.build {
-                        series(
-                            statistics.successfulLaunches,
-                            statistics.failedLaunches
+                val chartEntryModelProducer = remember { ChartEntryModelProducer() }
+
+                LaunchedEffect(statistics.successfulLaunches, statistics.failedLaunches) {
+                    chartEntryModelProducer.setEntries(
+                        listOf(
+                            entryOf(0, statistics.successfulLaunches),
+                            entryOf(1, statistics.failedLaunches)
                         )
-                    }
-                )
-                
-                CartesianChartHost(
-                    chart = rememberCartesianChart(
-                        rememberColumnCartesianLayer()
-                    ),
-                    model = chartModel,
+                    )
+                }
+
+                Chart(
+                    chart = columnChart(),
+                    chartModelProducer = chartEntryModelProducer,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                 )
-                
-                // Leyenda manual
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -293,29 +274,30 @@ private fun LaunchesPerYearChart(yearlyStats: List<YearlyStats>) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "📅 Lanzamientos por Año",
+                text = "Lanzamientos por Ano",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
-            val chartModel = CartesianChartModel(
-                LineCartesianLayerModel.build {
-                    series(yearlyStats.map { it.launches.toFloat() })
-                }
-            )
-            
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberLineCartesianLayer()
-                ),
-                model = chartModel,
+
+            val chartEntryModelProducer = remember { ChartEntryModelProducer() }
+
+            LaunchedEffect(yearlyStats) {
+                chartEntryModelProducer.setEntries(
+                    yearlyStats.mapIndexed { index, stat ->
+                        entryOf(index, stat.launches)
+                    }
+                )
+            }
+
+            Chart(
+                chart = lineChart(),
+                chartModelProducer = chartEntryModelProducer,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             )
-            
-            // Mostrar años en una fila
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -344,12 +326,12 @@ private fun RocketStatsChart(rocketStats: List<RocketStats>) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🚀 Estadísticas por Cohete",
+                text = "Estadisticas por Cohete",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
+
             rocketStats.take(4).forEach { rocketStat ->
                 RocketStatItem(rocketStat)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -364,16 +346,15 @@ private fun RocketStatItem(rocketStat: RocketStats) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Color indicator
         Box(
             modifier = Modifier
                 .size(12.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(Color(android.graphics.Color.parseColor(rocketStat.color)))
         )
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = rocketStat.rocketName,
@@ -381,16 +362,16 @@ private fun RocketStatItem(rocketStat: RocketStats) {
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "${rocketStat.launches} lanzamientos • ${rocketStat.successes} éxitos",
+                text = "${rocketStat.launches} lanzamientos - ${rocketStat.successes} exitos",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
+
         val successRate = if (rocketStat.launches > 0) {
             (rocketStat.successes.toFloat() / rocketStat.launches.toFloat()) * 100f
         } else 0f
-        
+
         Text(
             text = "${String.format("%.0f", successRate)}%",
             style = MaterialTheme.typography.bodyMedium,
@@ -409,12 +390,12 @@ private fun BoosterStatsCard(statistics: SpaceXStatistics) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🔄 Estadísticas de Boosters",
+                text = "Estadisticas de Boosters",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -422,23 +403,23 @@ private fun BoosterStatsCard(statistics: SpaceXStatistics) {
                 StatItem(
                     value = statistics.boostersRecovered.toString(),
                     label = "Recuperados",
-                    icon = "✅"
+                    icon = "OK"
                 )
                 StatItem(
                     value = statistics.boostersLost.toString(),
                     label = "Perdidos",
-                    icon = "❌"
+                    icon = "X"
                 )
-                
+
                 val recoveryRate = if ((statistics.boostersRecovered + statistics.boostersLost) > 0) {
-                    (statistics.boostersRecovered.toFloat() / 
+                    (statistics.boostersRecovered.toFloat() /
                      (statistics.boostersRecovered + statistics.boostersLost).toFloat()) * 100f
                 } else 0f
-                
+
                 StatItem(
                     value = "${String.format("%.1f", recoveryRate)}%",
-                    label = "Tasa Recuperación",
-                    icon = "🔄"
+                    label = "Tasa Recuperacion",
+                    icon = "R"
                 )
             }
         }
