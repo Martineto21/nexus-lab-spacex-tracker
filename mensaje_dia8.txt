@@ -1,0 +1,88 @@
+🚀 *Nexus Lab - Día 8*
+*DARK MODE + THEMING SPACEX* 🌙
+
+¡Hoy le damos a nuestra app la identidad visual de SpaceX! Modo oscuro, colores oficiales y una pantalla de configuración completa.
+
+*🎯 ¿Qué vamos a hacer?*
+* Implementar dark/light mode con persistencia
+* Colores oficiales de SpaceX más auténticos  
+* Pantalla de configuración para cambiar tema
+* Gestión de preferencias con DataStore
+* Inyección de dependencias con Hilt
+
+*📋 PASOS CON NEXUS PLATFORM*
+
+*1️⃣ Ve a tu Workspace*
+* app.kalmiazen.com → Proyectos → SpaceX Tracker
+* Workspace → Nueva pestaña
+
+*2️⃣ Copia y pega esto al agente:*
+
+```
+Implementa dark/light mode completo en la app SpaceX:
+
+1. Añade dependencias: DataStore, Hilt para DI
+2. Crea ThemePreferences con DataStore para persistir tema elegido
+3. Crea ThemeViewModel que gestione el estado del tema
+4. Actualiza MainActivity para usar Hilt (@AndroidEntryPoint)
+5. Crea SpaceXTrackerApplication para inicializar Hilt
+6. Actualiza colores SpaceX para ser más auténticos (azul #005288)
+7. Mejora Theme.kt con esquemas dark/light más contrastados
+8. Crea SettingsScreen con toggles para cambiar tema
+9. Añade SettingsScreen a la navegación
+10. Permite alternar entre: seguir sistema, forzar oscuro, forzar claro
+
+Asegúrate de que compile sin errores.
+```
+
+*3️⃣ ¿Qué va a generar?*
+* `ThemePreferences.kt` - Persistencia con DataStore
+* `ThemeViewModel.kt` - Lógica de estado del tema
+* `SettingsScreen.kt` - Pantalla de configuración
+* `AppModule.kt` - Inyección de dependencias
+* Updates en `MainActivity`, `Theme.kt`, `Color.kt`
+
+*4️⃣ ¿Cómo probarlo?*
+* Compila y ejecuta
+* Ve a la pestaña "Settings" (nueva)
+* Cambia entre modo claro/oscuro
+* Verifica que la preferencia persiste al reiniciar
+* Prueba "seguir sistema"
+
+*🎨 DETALLES TÉCNICOS*
+
+*Colores auténticos SpaceX:*
+* Azul oficial: `#005288`
+* Negro espacial: `#0D1117`
+* Contraste perfecto para accesibilidad
+
+*Arquitectura:*
+* DataStore para preferencias
+* Hilt para inyección de dependencias
+* ViewModel con StateFlow
+* Material 3 con temas dinámicos
+
+*🔧 Si algo falla:*
+* Dile al agente: "El build falla, revisa las dependencias"
+* O: "SettingsScreen no compila, arregla los imports"
+* O: "No persiste el tema, revisa DataStore"
+
+*💡 TIPS NEXUS*
+* Nexus entiende "tema oscuro tipo SpaceX"
+* Puede generar toda la arquitectura DI de una vez
+* Si no te gusta algo: "cambia X por Y"
+* Para debug: "añade logs en ThemeViewModel"
+
+*🎯 RESULTADO ESPERADO*
+Una app con identidad visual SpaceX completa, modo oscuro por defecto (como el espacio 🌌), pero con opción de cambiar a claro.
+
+*📱 PRÓXIMO DÍA*
+Mañana: modo offline + performance (Room, caché, optimización)
+
+---
+*💻 Código en GitHub:*
+https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/5769157
+
+*🤖 Nexus Lab*
+_Agente especializado en formación técnica_
+_Powered by Nexus Platform_
