@@ -1,0 +1,73 @@
+🚀 *Nexus Lab - Día 9*
+*SpaceX Tracker: Modo Offline + Performance*
+
+¡Buenos días! Hoy implementamos funcionalidades críticas para apps profesionales: *caché offline* y *optimización de performance*. ¿El resultado? Una app que funciona sin internet y carga al instante.
+
+*🎯 ¿Qué vamos a lograr hoy?*
+• App funciona completamente offline
+• Datos se cargan instantáneamente desde caché
+• Sincronización automática en background
+• Performance optimizada con Room + Flow
+
+*📱 Pasos en Nexus Platform:*
+
+1. Ve a tu Workspace → proyecto SpaceX Tracker
+2. Abre una nueva pestaña
+3. Copia y pega este prompt al agente:
+
+*"Implementa modo offline con Room database:
+
+1. Añade Room dependencies al build.gradle
+2. Crea entidades LaunchEntity, RocketEntity, LaunchpadEntity
+3. Crea DAOs con métodos Flow para reactive UI
+4. Implementa SpaceXDatabase con Room
+5. Actualiza SpaceXRepository con patrón offline-first:
+   - Consulta cache primero
+   - Si cache válido, úsalo
+   - Si no, fetch de API y actualiza cache
+   - Fallback a cache stale si no hay red
+6. Añade WorkManager para sync automático cada 2h
+7. Usa Flow en ViewModels para updates reactivos
+8. Configura Hilt para inyección de database
+
+Patrón offline-first: Cache > Network > Stale Cache"*
+
+*🔍 ¿Qué va a generar el agente?*
+• `database/` - Entidades, DAOs y Database Room
+• `sync/` - Worker para sincronización automática  
+• Repository actualizado con lógica offline-first
+• ViewModels con Flow para UI reactiva
+• Inyección de dependencias configurada
+
+*✅ ¿Cómo verificar que funciona?*
+1. Compila y ejecuta la app
+2. Navega por las pantallas (se cachean los datos)
+3. Activa modo avión
+4. ¡La app sigue funcionando! Datos offline
+5. Desactiva modo avión - sincroniza automáticamente
+
+*🚀 Trucos de Nexus:*
+• Si algo no compila: "Arregla los errores de compilación"
+• Para personalizar cache: "Cambia el tiempo de caché a X minutos"
+• Para debug: "Añade logs para rastrear estado offline/online"
+• Performance issue: "Optimiza las consultas de Room con indices"
+
+*🧠 ¿Por qué esto es importante?*
+En apps reales, los usuarios esperan que funcionen siempre. Sin internet en el metro, con red lenta, etc. El patrón offline-first es estándar en apps profesionales.
+
+*📊 Lo que aprendes hoy:*
+• Room Database (SQLite moderno)
+• Patrón Repository offline-first
+• WorkManager para tareas background
+• Flow para UI reactiva
+• Gestión de caché inteligente
+• Performance optimization patterns
+
+*💡 Próximo reto:*
+Mañana (Día 10): Build release, firmar APK, preparar Play Store. ¡El gran final!
+
+*🔗 Código de referencia:*
+https://github.com/Martineto21/nexus-lab-spacex-tracker/commit/73bc835
+
+*—Nexus Lab*
+_Enseñando Android + Nexus Platform_
