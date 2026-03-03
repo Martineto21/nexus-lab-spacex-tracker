@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.datetime.*
@@ -55,7 +55,7 @@ fun LaunchDetailScreen(
     launchId: String,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LaunchDetailViewModel = viewModel()
+    viewModel: LaunchDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
@@ -72,15 +72,17 @@ fun LaunchDetailScreen(
                 LaunchDetailLoadingState()
             }
             uiState.error != null -> {
+                val error = uiState.error!!
                 LaunchDetailErrorState(
-                    error = uiState.error,
+                    error = error,
                     onRetry = { viewModel.loadLaunchDetail(launchId) },
                     onNavigateBack = onNavigateBack
                 )
             }
             uiState.launch != null -> {
+                val launch = uiState.launch!!
                 LaunchDetailContent(
-                    launch = uiState.launch,
+                    launch = launch,
                     scrollState = scrollState,
                     onLinkClick = { url -> 
                         try {
@@ -135,9 +137,9 @@ private fun LaunchDetailContent(
             // Timeline de la misión
             LaunchTimeline(launch = launch)
             
-            // Galería de imágenes
-            launch.links.flickr.original.takeIf { it.isNotEmpty() }?.let { images ->
-                LaunchImageGallery(images = images)
+            // Galería de imágenes (patch only, flickr not in model)
+            launch.links.patch?.large?.let { image ->
+                LaunchImageGallery(images = listOf(image))
             }
             
             // Enlaces externos
@@ -165,8 +167,7 @@ private fun LaunchHeroSection(
             .height(300.dp)
     ) {
         // Imagen de fondo (parche o placeholder)
-        val heroImage = launch.links.patch?.large 
-            ?: launch.links.flickr.original.firstOrNull()
+        val heroImage = launch.links.patch?.large
             
         if (heroImage != null) {
             AsyncImage(
@@ -286,8 +287,8 @@ private fun LaunchBasicInfo(launch: Launch) {
             ) {
                 InfoChip(
                     icon = Icons.Default.FlightTakeoff,
-                    label = "Número de vuelo",
-                    value = launch.flightNumber.toString()
+                    label = "ID Misión",
+                    value = launch.id.take(8)
                 )
                 
                 InfoChip(
@@ -382,23 +383,13 @@ private fun LaunchTechnicalData(launch: Launch) {
                 )
                 
                 TechnicalDataRow(
-                    label = "Número de vuelo",
-                    value = "#${launch.flightNumber}"
-                )
-                
-                TechnicalDataRow(
                     label = "Fecha UTC",
                     value = formatLaunchDateUTC(launch.dateUtc)
                 )
-                
+
                 TechnicalDataRow(
-                    label = "Ventana de lanzamiento",
-                    value = launch.autoUpdate?.toString() ?: "No especificada"
-                )
-                
-                TechnicalDataRow(
-                    label = "Actualización automática",
-                    value = if (launch.autoUpdate == true) "Activa" else "Inactiva"
+                    label = "Launchpad",
+                    value = launch.launchpadId.take(12)
                 )
             }
         }

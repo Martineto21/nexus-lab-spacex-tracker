@@ -8,48 +8,71 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.nexuslab.spacextracker.BuildConfig
 import com.nexuslab.spacextracker.data.model.Launchpad
 import com.nexuslab.spacextracker.presentation.viewmodel.LaunchpadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LaunchpadMapScreen(
-    viewModel: LaunchpadViewModel = viewModel()
+    viewModel: LaunchpadViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
-    // Centro del mapa en Cabo Cañaveral (SpaceX)
+    val uiState by viewModel.uiState.collectAsState()
+    val hasMapsApiKey = BuildConfig.MAPS_API_KEY.isNotBlank()
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(28.5721, -80.6480), 6f)
     }
-    
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // Mapa
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = false)
-        ) {
-            // Marcadores para cada launchpad
-            uiState.launchpads.forEach { launchpad ->
-                Marker(
-                    state = MarkerState(position = LatLng(launchpad.latitude, launchpad.longitude)),
-                    title = launchpad.name,
-                    snippet = "${launchpad.locality}, ${launchpad.region}",
-                    onClick = {
-                        viewModel.selectLaunchpad(launchpad)
-                        false // No centrar automáticamente
-                    }
-                )
+        if (hasMapsApiKey) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(isMyLocationEnabled = false)
+            ) {
+                val launchpads: List<Launchpad> = uiState.launchpads
+                for (launchpad in launchpads) {
+                    Marker(
+                        state = MarkerState(position = LatLng(launchpad.latitude, launchpad.longitude)),
+                        title = launchpad.name,
+                        snippet = "${launchpad.locality}, ${launchpad.region}",
+                        onClick = {
+                            viewModel.selectLaunchpad(launchpad)
+                            false
+                        }
+                    )
+                }
+            }
+        } else {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.TopCenter),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Mapa no configurado",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Text(
+                        text = "Agrega MAPS_API_KEY en local.properties para mostrar el mapa.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
         }
-        
-        // Loading indicator
+
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -63,18 +86,15 @@ fun LaunchpadMapScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp)
-                        )
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Cargando launchpads...")
+                        Text(text = "Cargando launchpads...")
                     }
                 }
             }
         }
-        
-        // Error message
-        uiState.error?.let { errorMessage ->
+
+        uiState.error?.let { errorMessage: String ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,14 +119,13 @@ fun LaunchpadMapScreen(
                         onClick = { viewModel.retryLoading() },
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
-                        Text("Reintentar")
+                        Text(text = "Reintentar")
                     }
                 }
             }
         }
-        
-        // Bottom sheet para launchpad seleccionado
-        uiState.selectedLaunchpad?.let { launchpad ->
+
+        uiState.selectedLaunchpad?.let { launchpad: Launchpad ->
             LaunchpadInfoCard(
                 launchpad = launchpad,
                 modifier = Modifier
@@ -135,7 +154,6 @@ private fun LaunchpadInfoCard(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -153,15 +171,14 @@ private fun LaunchpadInfoCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 IconButton(onClick = onDismiss) {
-                    Text("✕")
+                    Text(text = "x")
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
-            // Stats
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -171,16 +188,15 @@ private fun LaunchpadInfoCard(
                     value = launchpad.launchAttempts.toString()
                 )
                 StatChip(
-                    label = "Éxitos",
+                    label = "Exitos",
                     value = launchpad.launchSuccesses.toString()
                 )
                 StatChip(
-                    label = "Éxito",
+                    label = "Exito",
                     value = "${launchpad.successRate.toInt()}%"
                 )
             }
-            
-            // Detalles
+
             launchpad.details?.let { details ->
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -189,20 +205,19 @@ private fun LaunchpadInfoCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
-            // Status
+
             Spacer(modifier = Modifier.height(12.dp))
             AssistChip(
                 onClick = { },
-                label = { 
+                label = {
                     Text(
-                        text = when(launchpad.status) {
-                            "active" -> "🟢 Activo"
-                            "inactive" -> "🔴 Inactivo"
-                            "under_construction" -> "🟡 En construcción"
-                            "lost" -> "⚫ Perdido"
-                            "retired" -> "🔵 Retirado"
-                            else -> "❓ ${launchpad.status}"
+                        text = when (launchpad.status) {
+                            "active" -> "Activo"
+                            "inactive" -> "Inactivo"
+                            "under_construction" -> "En construccion"
+                            "lost" -> "Perdido"
+                            "retired" -> "Retirado"
+                            else -> launchpad.status
                         }
                     )
                 }

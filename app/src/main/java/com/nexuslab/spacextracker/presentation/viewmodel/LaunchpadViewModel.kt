@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexuslab.spacextracker.data.model.Launchpad
 import com.nexuslab.spacextracker.data.repository.SpaceXRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LaunchpadViewModel : ViewModel() {
-    
-    private val repository = SpaceXRepository()
+@HiltViewModel
+class LaunchpadViewModel @Inject constructor(
+    private val repository: SpaceXRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(LaunchpadUiState())
     val uiState: StateFlow<LaunchpadUiState> = _uiState.asStateFlow()

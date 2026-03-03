@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 
 /**
@@ -36,7 +36,7 @@ import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: LaunchesViewModel = viewModel()
+    viewModel: LaunchesViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()

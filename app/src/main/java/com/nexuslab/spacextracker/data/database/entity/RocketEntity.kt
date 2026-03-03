@@ -39,11 +39,8 @@ data class RocketEntity(
             firstFlight = firstFlight,
             country = country,
             company = company,
-            wikipedia = wikipedia,
-            description = description,
-            height = Rocket.Dimension(heightMeters, null),
-            diameter = Rocket.Dimension(diameterMeters, null),
-            mass = Rocket.Mass(massKg, null),
+            wikipedia = wikipedia ?: "",
+            description = description ?: "",
             flickrImages = emptyList() // Would need JSON parsing
         )
     }
@@ -64,9 +61,9 @@ data class RocketEntity(
                 company = rocket.company,
                 wikipedia = rocket.wikipedia,
                 description = rocket.description,
-                heightMeters = rocket.height.meters,
-                diameterMeters = rocket.diameter.meters,
-                massKg = rocket.mass.kg,
+                heightMeters = 0.0,
+                diameterMeters = 0.0,
+                massKg = 0,
                 flickrImages = "" // Would need JSON serialization
             )
         }

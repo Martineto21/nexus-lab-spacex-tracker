@@ -8,18 +8,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.nexuslab.spacextracker.data.model.Launch
 import com.nexuslab.spacextracker.data.repository.SpaceXRepository
-
-/**
- * LaunchDetailViewModel - ViewModel para pantalla de detalle
- * 
- * Generado para Día 4 del curso Nexus Lab - 25/02/2026
- * Agente responsable: Upe (Memoria Viva)
- * 
- * Gestiona:
- * - Carga de detalle específico del lanzamiento
- * - Estados de carga y error
- * - Datos adicionales para la pantalla de detalle
- */
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class LaunchDetailUiState(
     val isLoading: Boolean = false,
@@ -27,8 +17,10 @@ data class LaunchDetailUiState(
     val error: String? = null
 )
 
-class LaunchDetailViewModel : ViewModel() {
-    private val repository = SpaceXRepository()
+@HiltViewModel
+class LaunchDetailViewModel @Inject constructor(
+    private val repository: SpaceXRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(LaunchDetailUiState())
     val uiState: StateFlow<LaunchDetailUiState> = _uiState.asStateFlow()

@@ -4,8 +4,10 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -22,11 +24,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.datetime.*
 import com.nexuslab.spacextracker.data.model.Launch
+import com.nexuslab.spacextracker.presentation.isFutureLaunch
+import com.nexuslab.spacextracker.presentation.selectUpcomingLaunches
 import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 
 /**
@@ -50,10 +54,12 @@ import com.nexuslab.spacextracker.presentation.viewmodel.LaunchesViewModel
 fun LaunchesScreen(
     onLaunchClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: LaunchesViewModel = viewModel()
+    viewModel: LaunchesViewModel = hiltViewModel()
 ) {
     var selectedFilter by remember { mutableStateOf(LaunchFilter.ALL) }
     val uiState by viewModel.uiState.collectAsState()
+    val now = Clock.System.now()
+    val upcomingLaunches = selectUpcomingLaunches(uiState.launches, now)
     
     // Cargar datos al inicializar la pantalla
     LaunchedEffect(Unit) {
@@ -63,7 +69,7 @@ fun LaunchesScreen(
     // Filtrar lanzamientos según el filtro seleccionado
     val filteredLaunches = when (selectedFilter) {
         LaunchFilter.ALL -> uiState.launches
-        LaunchFilter.UPCOMING -> uiState.launches.filter { it.upcoming }
+        LaunchFilter.UPCOMING -> upcomingLaunches
         LaunchFilter.SUCCESS -> uiState.launches.filter { it.success == true }
         LaunchFilter.FAILED -> uiState.launches.filter { it.success == false }
     }
@@ -92,7 +98,7 @@ fun LaunchesScreen(
             onFilterSelected = { selectedFilter = it },
             launchCounts = LaunchCounts(
                 total = uiState.launches.size,
-                upcoming = uiState.launches.count { it.upcoming },
+                upcoming = upcomingLaunches.size,
                 success = uiState.launches.count { it.success == true },
                 failed = uiState.launches.count { it.success == false }
             )
@@ -106,8 +112,9 @@ fun LaunchesScreen(
                 LoadingState()
             }
             uiState.error != null && uiState.launches.isEmpty() -> {
+                val error = uiState.error!!
                 ErrorState(
-                    error = uiState.error,
+                    error = error,
                     onRetry = { viewModel.loadLaunches() }
                 )
             }
@@ -116,6 +123,9 @@ fun LaunchesScreen(
             }
             else -> {
                 LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
@@ -269,7 +279,9 @@ private fun LaunchFilterRow(
     launchCounts: LaunchCounts
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         LaunchFilter.values().forEach { filter ->
@@ -549,7 +561,7 @@ private fun AnimatedLaunchCard(
 @Composable
 private fun LaunchStatusBadge(launch: Launch) {
     val (icon, color, text) = when {
-        launch.upcoming -> Triple(
+        isFutureLaunch(launch.dateUtc, Clock.System.now()) -> Triple(
             Icons.Default.Schedule,
             MaterialTheme.colorScheme.tertiary,
             "Próximo"
@@ -650,3 +662,5 @@ private fun formatLaunchDate(dateUtc: String): String {
         dateUtc.take(10).replace("-", "/")
     }
 }
+
+

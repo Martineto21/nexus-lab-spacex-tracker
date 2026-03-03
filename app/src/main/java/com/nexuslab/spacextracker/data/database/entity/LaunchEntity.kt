@@ -3,7 +3,7 @@ package com.nexuslab.spacextracker.data.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nexuslab.spacextracker.data.model.Launch
-import kotlinx.datetime.Instant
+import com.nexuslab.spacextracker.data.model.Links
 
 @Entity(tableName = "launches")
 data class LaunchEntity(
@@ -35,26 +35,19 @@ data class LaunchEntity(
         return Launch(
             id = id,
             name = name,
-            flightNumber = flightNumber,
-            dateUtc = Instant.parse(dateUtc),
+            dateUtc = dateUtc,
             success = success,
             upcoming = upcoming,
-            rocket = rocketId,
-            launchpad = launchpadId,
+            rocketId = rocketId,
+            launchpadId = launchpadId,
             details = details,
-            links = null, // Would need JSON parsing
-            cores = emptyList(), // Would need JSON parsing
-            payloads = emptyList(), // Would need JSON parsing
-            fairings = null, // Would need JSON parsing
-            staticFireDateUtc = staticFireDateUtc?.let { Instant.parse(it) },
-            netPrecision = netPrecision,
-            window = if (windowStart != null && windowEnd != null) {
-                Instant.parse(windowStart) to Instant.parse(windowEnd)
-            } else null,
-            tbd = tbd,
-            tnet = tnet,
-            holdReason = holdReason,
-            failureReason = failureReason
+            links = Links(
+                patch = null,
+                reddit = null,
+                article = null,
+                wikipedia = null,
+                video = null
+            )
         )
     }
     
@@ -63,25 +56,25 @@ data class LaunchEntity(
             return LaunchEntity(
                 id = launch.id,
                 name = launch.name,
-                flightNumber = launch.flightNumber,
-                dateUtc = launch.dateUtc.toString(),
+                flightNumber = 0,
+                dateUtc = launch.dateUtc,
                 success = launch.success,
                 upcoming = launch.upcoming,
-                rocketId = launch.rocket,
-                launchpadId = launch.launchpad,
+                rocketId = launch.rocketId,
+                launchpadId = launch.launchpadId,
                 details = launch.details,
                 links = null, // Would need JSON serialization
                 cores = null, // Would need JSON serialization  
                 payloads = null, // Would need JSON serialization
                 fairings = null, // Would need JSON serialization
-                staticFireDateUtc = launch.staticFireDateUtc?.toString(),
-                netPrecision = launch.netPrecision,
-                windowStart = launch.window?.first?.toString(),
-                windowEnd = launch.window?.second?.toString(),
-                tbd = launch.tbd,
-                tnet = launch.tnet,
-                holdReason = launch.holdReason,
-                failureReason = launch.failureReason
+                staticFireDateUtc = null,
+                netPrecision = null,
+                windowStart = null,
+                windowEnd = null,
+                tbd = false,
+                tnet = false,
+                holdReason = null,
+                failureReason = null
             )
         }
     }
